@@ -1,12 +1,12 @@
 package com.codeveo.gwt.stomp.client;
 
+import com.google.gwt.core.client.JavaScriptObject;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.google.gwt.core.client.JavaScriptObject;
 
 public class StompClient {
     private static final Logger logger = Logger.getLogger(StompClient.class.getName());
@@ -35,14 +35,27 @@ public class StompClient {
     }
 
     public final void connect() {
+        connect(new HashMap<String, String>());
+    }
+
+    public final void connect(Map<String, String> headers) {
         if (isConnected) {
             logger.log(Level.FINE, "Already connected");
             return;
         }
 
+        JavaScriptObject jsHeaders = JavaScriptObject.createObject();
+        for(Entry<String, String> header : headers.entrySet()) {
+            putString(jsHeaders, header.getKey(), header.getValue());
+        }
+
         logger.log(Level.FINE, "Connecting to '" + wsURL + "' ...");
-        __connect(wsURL, useSockJs, enableDebug);
+        __connect(wsURL, useSockJs, enableDebug, jsHeaders);
     }
+    private native JavaScriptObject putString(JavaScriptObject jso, String key, String value)/*-{
+        jso[key] = value;
+        return jso;
+    }-*/;
 
     public final void disconnect() {
         for (Entry<String, Subscription> id : subscriptions.entrySet()) {
@@ -81,7 +94,7 @@ public class StompClient {
         self.@com.codeveo.gwt.stomp.client.StompClient::jsoStompClient.send(destination, {}, jsonString);
     }-*/;
 
-    private native final void __connect(String wsURL, boolean overSockJs, boolean enableDebug)
+    private native final void __connect(String wsURL, boolean overSockJs, boolean enableDebug, JavaScriptObject headers)
     /*-{
         var self = this;
 
@@ -107,7 +120,7 @@ public class StompClient {
             self.@com.codeveo.gwt.stomp.client.StompClient::jsoStompClient.debug = null;
         }
 
-        self.@com.codeveo.gwt.stomp.client.StompClient::jsoStompClient.connect({}, onConnected);
+        self.@com.codeveo.gwt.stomp.client.StompClient::jsoStompClient.connect(headers, onConnected);
     }-*/;
 
     private native final void __disconnect()
