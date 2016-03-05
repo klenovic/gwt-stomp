@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to='testingModule'>
+    <!-- Core GWT -->
+    <inherits name='com.google.gwt.user.User'/>
+
+    <!-- GWT Stomp -->
+    <inherits name="com.codeveo.gwt.stomp.StompClient"/>
+
+    <!-- Module entry point -->
+    <entry-point class='com.codeveo.gwt.stomp.testing.client.GwtStompTestingEntryPoint'/>
+
+    <source path='client'/>
+</module>
