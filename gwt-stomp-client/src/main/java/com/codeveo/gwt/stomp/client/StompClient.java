@@ -19,10 +19,34 @@ public class StompClient {
     private boolean enableDebug;
 
     public interface Callback {
+        /**
+         * Called when connection is opened and ready to send, subscribe and receive messages.<br/>
+         * Only called right after connect() is.<br/>
+         * Then, isConnected() will return true.
+         * @see StompClient#connect()
+         */
         void onConnect();
 
+        /**
+         * Called when established connection is lost (due to server side or client side) or cannot be established<br/>
+         * Reasons could be : <br/>
+         * - stomp.js or sock.js is not loaded. It's developer responsability to load it.<br/>
+         * - wrong url sheme. If you are only using websocket and you don't provide url like ws:// or wss://<br/>
+         * - connection lost on client side for any reason<br/>
+         * - connection closed by server<br/>
+         * Only called right after connect() or some times after onConnect().<br/>
+         * Then, isConnected() will return false.
+         * @see StompClient#connect()
+         * @param cause Error cause.
+         */
         void onError(String cause);
 
+        /**
+         * Called when clean disconnection is done.<br/>
+         * Only called after disconnect().<br/>
+         * Then, isConnected() will return false
+         * @see StompClient#disconnect()
+         */
         void onDisconnect();
     }
 
@@ -30,7 +54,7 @@ public class StompClient {
         this.useSockJs = useSockJs;
         this.wsURL = wsURL;
         this.callback = callback;
-        this.subscriptions = new HashMap<String, Subscription>();
+        this.subscriptions = new HashMap<>();
         this.enableDebug = enableDebug;
     }
 
@@ -49,8 +73,10 @@ public class StompClient {
         }
 
         JavaScriptObject jsHeaders = JavaScriptObject.createObject();
-        for(Entry<String, String> header : headers.entrySet()) {
-            putString(jsHeaders, header.getKey(), header.getValue());
+        if(headers != null) {
+            for (Entry<String, String> header : headers.entrySet()) {
+                putString(jsHeaders, header.getKey(), header.getValue());
+            }
         }
 
         LOGGER.log(Level.FINE, "Connecting to '" + wsURL + "' ...");
@@ -204,5 +230,9 @@ public class StompClient {
         if (callback != null) {
             callback.onError(cause);
         }
+    }
+
+    public boolean isConnected() {
+        return isConnected;
     }
 }
