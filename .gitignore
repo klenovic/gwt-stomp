@@ -3,12 +3,15 @@ target/
 generated/
 test-output/
 gwt-unitCache/
-src/main/webapp/WEB-INF/classes/
 
-# eclipse genereted
+# eclipse generated
 .settings
 .project
 .classpath
+
+# intelliJ generated
+.idea/
+*.iml
 
 # java & gwt compiler
 *.class

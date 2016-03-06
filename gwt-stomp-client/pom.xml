@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>gwt-stomp-parent</artifactId>
+        <groupId>com.codeveo.gwt</groupId>
+        <version>1.0.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>gwt-stomp</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.gwt</groupId>
+            <artifactId>gwt-user</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.samaxes.maven</groupId>
+                <artifactId>minify-maven-plugin</artifactId>
+                <version>1.7.4</version>
+                <configuration>
+                    <charset>UTF-8</charset>
+                    <jsEngine>CLOSURE</jsEngine>
+                    <webappSourceDir>${project.basedir}/src/main/resources</webappSourceDir>
+                    <jsSourceDir>/</jsSourceDir>
+                    <webappTargetDir>${project.build.outputDirectory}</webappTargetDir>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>minify-stomp.js</id>
+                        <goals><goal>minify</goal></goals>
+                        <configuration>
+                            <jsSourceIncludes>
+                                <jsSourceInclude>stomp-2.3.4.js</jsSourceInclude>
+                            </jsSourceIncludes>
+                            <jsFinalFile>stomp-2.3.4.js</jsFinalFile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>minify-sockjs.js</id>
+                        <goals><goal>minify</goal></goals>
+                        <configuration>
+                            <jsSourceIncludes>
+                                <jsSourceInclude>sockjs-0.3.4.js</jsSourceInclude>
+                            </jsSourceIncludes>
+                            <jsFinalFile>sockjs-0.3.4.js</jsFinalFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>gwt-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>resources</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

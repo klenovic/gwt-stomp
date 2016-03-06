@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" language="javascript" src="stomp-2.3.4.js"></script>
+    <script type="text/javascript" language="javascript" src="jquery-1.12.1.js"></script>
+    <title></title>
+</head>
+<body>
+    <script>
+        $(document).ready(function() {
+//            var client = Stomp.client("ws://localhost:8080/stomp/");
+//            var client = Stomp.client("ws://localhost:8089/stompp/");
+            try {
+                var client = Stomp.client("http://localhost:8080/stomp/");
+
+                var connect_callback = function() {
+                    window.alert("connected");
+                };
+
+                var error_callback = function(msg) {
+                    window.alert(msg);
+                };
+
+                client.connect([], connect_callback, error_callback);
+            } catch(err) {
+                console.log(typeof(err));
+                console.log(err);
+                console.log(typeof(err.message));
+                console.log(err.message);
+                window.alert(err);
+            }
+        });
+    </script>
+</body>
+</html>
