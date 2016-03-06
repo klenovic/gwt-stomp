@@ -1,14 +1,24 @@
 package com.codeveo.gwt.stomp.testing.client;
 
 import com.codeveo.gwt.stomp.client.StompClient;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class WebsocketConnectionTestingWidget implements TestingWidget {
+
+public class WebSocketConnectionTestingWidget implements TestingWidget {
+
+    interface WebSocketConnectionTestingWidgetUiBinder extends UiBinder<FlowPanel, WebSocketConnectionTestingWidget> {
+    }
+
+    private static WebSocketConnectionTestingWidgetUiBinder uiBinder = GWT.create(WebSocketConnectionTestingWidgetUiBinder.class);
 
     private final static boolean STOMP_DEBUG = true;
 
@@ -16,65 +26,32 @@ public class WebsocketConnectionTestingWidget implements TestingWidget {
 
     private StompClient stompClient;
 
-    public WebsocketConnectionTestingWidget() {
-        rootWidget = new FlowPanel();
-    }
+    private TestCallback testCallback;
 
-    @Override
-    public String getTestId() {
-        return "websocketConnectionTest";
-    }
+    @UiField
+    protected TextBox wsUrlInput;
 
-    @Override
-    public void reset() {
-        rootWidget.clear();
-        if(stompClient != null) {
-            stompClient.disconnect();
-        }
+    @UiField
+    protected Label statusLabel;
 
-        final TextBox wsUrlInput = new TextBox();
-        wsUrlInput.getElement().setId("websocket-url-input");
+    @UiField
+    protected Label errorLabel;
 
-        final Label statusLabel = new Label("INIT");
-        statusLabel.getElement().setId("connection-status-label");
+    @UiField
+    protected Label endpointUrl;
 
-        final Label errorLabel = new Label();
-        errorLabel.getElement().setId("error-cause");
+    @UiField
+    protected Button connectButton;
 
-        final Label endpointUrl = new Label();
-        endpointUrl.getElement().setId("websocket-url");
+    @UiField
+    protected Button disconnectButton;
 
-        final Button connectButton = new Button("CONNECT");
-        connectButton.getElement().setId("connect-button");
+    @UiField
+    protected SendPanel sendPanel;
 
-        final Button disconnectButton = new Button("DISCONNECT");
-        disconnectButton.getElement().setId("disconnect-button");
-        disconnectButton.setEnabled(false);
-
-        stompClient = new StompClient(null, new StompClient.Callback() {
-            @Override
-            public void onConnect() {
-                statusLabel.setText("CONNECTED");
-                connectButton.setEnabled(false);
-                disconnectButton.setEnabled(true);
-            }
-
-            @Override
-            public void onError(String cause) {
-                statusLabel.setText("FAILED");
-                connectButton.setEnabled(true);
-                disconnectButton.setEnabled(false);
-                errorLabel.setText(cause);
-            }
-
-            @Override
-            public void onDisconnect() {
-                statusLabel.setText("DISCONNECTED");
-                connectButton.setEnabled(true);
-                disconnectButton.setEnabled(false);
-            }
-        }, false, STOMP_DEBUG);
-
+    public WebSocketConnectionTestingWidget() {
+        rootWidget = uiBinder.createAndBindUi(this);
+        setHtmlIdForSelenium();
         connectButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
@@ -97,16 +74,94 @@ public class WebsocketConnectionTestingWidget implements TestingWidget {
             }
         });
 
-        rootWidget.add(wsUrlInput);
-        rootWidget.add(endpointUrl);
-        rootWidget.add(connectButton);
-        rootWidget.add(disconnectButton);
-        rootWidget.add(statusLabel);
-        rootWidget.add(errorLabel);
+        sendPanel.setSendCommand(new Command() {
+            @Override
+            public void execute() {
+                sendPanel.setCanSend(false);
+                stompClient.send(sendPanel.getDestination(), "");
+                sendPanel.setCanSend(true);
+            }
+        });
+    }
+
+    @Override
+    public String getTestId() {
+        return "websocketConnectionTest";
+    }
+
+    @Override
+    public void reset() {
+        if(testCallback != null) {
+            testCallback.enabled = false;
+        }
+
+        if(stompClient != null) {
+            stompClient.disconnect();
+        }
+
+        wsUrlInput.setValue("");
+        statusLabel.setText("INIT");
+        endpointUrl.setText("");
+        errorLabel.setText("");
+        sendPanel.reset();
+        connectButton.setEnabled(true);
+        disconnectButton.setEnabled(false);
+        sendPanel.setCanSend(false);
+
+        testCallback = new TestCallback();
+        stompClient = new StompClient(null, testCallback, false, STOMP_DEBUG);
+    }
+
+    private void setHtmlIdForSelenium() {
+        wsUrlInput.getElement().setId("websocket-url-input");
+        statusLabel.getElement().setId("connection-status-label");
+        errorLabel.getElement().setId("error-cause");
+        endpointUrl.getElement().setId("websocket-url");
+        connectButton.getElement().setId("connect-button");
+        disconnectButton.getElement().setId("disconnect-button");
     }
 
     @Override
     public Widget asWidget() {
         return rootWidget;
+    }
+
+    public class TestCallback implements StompClient.Callback {
+
+        private boolean enabled = true;
+
+        @Override
+        public void onConnect() {
+            if(!enabled) {
+                return;
+            }
+            statusLabel.setText("CONNECTED");
+            connectButton.setEnabled(false);
+            disconnectButton.setEnabled(true);
+            sendPanel.setCanSend(true);
+        }
+
+        @Override
+        public void onError(String cause) {
+            if(!enabled) {
+                return;
+            }
+            statusLabel.setText("FAILED");
+            connectButton.setEnabled(true);
+            disconnectButton.setEnabled(false);
+            errorLabel.setText(cause);
+            sendPanel.setCanSend(false);
+        }
+
+        @Override
+        public void onDisconnect() {
+            if(!enabled) {
+                return;
+            }
+            statusLabel.setText("DISCONNECTED");
+            connectButton.setEnabled(true);
+            disconnectButton.setEnabled(false);
+            sendPanel.setCanSend(false);
+        }
     }
 }

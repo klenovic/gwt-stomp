@@ -38,7 +38,7 @@ public class GwtStompTestingEntryPoint implements EntryPoint {
 
     private void initMapping() {
         final List<TestingWidget> testingWidgets = new ArrayList<>();
-        testingWidgets.add(new WebsocketConnectionTestingWidget());
+        testingWidgets.add(new WebSocketConnectionTestingWidget());
 
         for(TestingWidget testingWidget : testingWidgets) {
             TestingWidget previous = mapping.put(testingWidget.getTestId(), testingWidget);

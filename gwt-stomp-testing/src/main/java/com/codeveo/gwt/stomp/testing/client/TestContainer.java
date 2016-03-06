@@ -46,6 +46,7 @@ public class TestContainer extends Composite {
     }
 
     public void setTestingWidget(TestingWidget testingWidget) {
+        testIdLabel.setText("");
         this.testingWidget = testingWidget;
         testingWidget.reset();
         testIdLabel.setText(testingWidget.getTestId());

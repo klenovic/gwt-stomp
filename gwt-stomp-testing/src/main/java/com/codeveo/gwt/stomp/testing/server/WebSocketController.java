@@ -35,7 +35,7 @@ public class WebSocketController {
     @MessageMapping("/close-connection")
     public void closeConnection(Message<?> message) {
         final String sessionId = WebSocketHeadersUtils.getHttpSessionId(message);
-        LOG.info("Client with sessionId {} asked for server-side websocket closing.");
+        LOG.info("Client with sessionId {} asked for server-side websocket closing.", sessionId);
 
         new Thread(new Runnable() {
             @Override

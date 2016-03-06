@@ -59,6 +59,7 @@ public class WebSocketConnectionIntTest {
         wait.until(ExpectedConditions.textToBePresentInElement(testIdElem, testId));
         WebElement resetButton = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("test-reset-button")));
         resetButton.click();
+        wait.until(ExpectedConditions.textToBePresentInElement(testIdElem, testId));
     }
 
     /**
@@ -177,12 +178,10 @@ public class WebSocketConnectionIntTest {
     }
 
     /**
-     * Test that connection is established. Then send message to request him to close websocket.<br/>
-     * We are testing that server side closing websocket will trigger error callback.
-     * TODO
+     * Test that connection is established. Then send message to server to request it to close websocket.<br/>
+     * We are testing that when server side is closing websocket, stomp will trigger error callback.
      */
     @Test
-    @Ignore
     public void testConnectionLostBecauseOfServer() {
         changeTestPage("websocketConnectionTest");
 
@@ -193,12 +192,15 @@ public class WebSocketConnectionIntTest {
         final WebElement wsUrlOutput = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("websocket-url")));
         final WebElement statusLabel = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("connection-status-label")));
         final WebElement connectBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("connect-button")));
-        final WebElement disconnectBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("disconnect-button")));
+        final WebElement sendBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("send-button")));
+        final WebElement destinationInput = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("destination-input")));
         wait.until(ExpectedConditions.textToBePresentInElement(statusLabel, "INIT"));
         connectBtn.click();
         wait.until(ExpectedConditions.textToBePresentInElement(wsUrlOutput, getWebsocketEndpoint()));
         wait.until(ExpectedConditions.textToBePresentInElement(statusLabel, "CONNECTED"));
-        disconnectBtn.click();
-        wait.until(ExpectedConditions.textToBePresentInElement(statusLabel, "DISCONNECTED"));
+        destinationInput.sendKeys("/app/close-connection");
+        sendBtn.click();
+        wait.until(ExpectedConditions.textToBePresentInElement(statusLabel, "FAILED"));
+        wait.until(ExpectedConditions.textToBePresentInElement(errorCause, STOMP_JS_ERR_MSG_PREFIX));
     }
 }

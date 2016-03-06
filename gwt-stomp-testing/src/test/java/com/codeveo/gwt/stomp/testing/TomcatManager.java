@@ -86,15 +86,6 @@ public class TomcatManager {
     }
 
     public void start() {
-
-        try {
-            LOG.info("BEFORE FOR NAME org.apache.jasper.servlet.JspServlet");
-            Class.forName("org.apache.jasper.servlet.JspServlet");
-            LOG.info("AFTER FOR NAME org.apache.jasper.servlet.JspServlet");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
         if(hasFailedOnce) {
             throw new RuntimeException("Tomcat never started. You have to check error on first try and fix it.");
         }
