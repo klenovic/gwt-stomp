@@ -1,0 +1,13 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+             xmlns:g='urn:import:com.google.gwt.user.client.ui'
+             xmlns:testing="urn:import:com.codeveo.gwt.stomp.testing.client">
+    <g:FlowPanel>
+        <g:TextBox ui:field="wsUrlInput"/>
+        <g:Label ui:field="statusLabel"/>
+        <g:Label ui:field="errorLabel"/>
+        <g:Label ui:field="endpointUrl"/>
+        <g:Button ui:field="connectButton" text="CONNECT"/>
+        <g:Button ui:field="disconnectButton" text="DISCONNECT"/>
+        <testing:SendPanel ui:field="sendPanel"/>
+    </g:FlowPanel>
+</ui:UiBinder>
